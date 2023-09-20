@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33423.256
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DSPC", "DSPC\DSPC.vcxproj", "{AF7AC630-D858-4361-8206-BE795B1E5044}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF7AC630-D858-4361-8206-BE795B1E5044}.Debug|x64.ActiveCfg = Debug|x64
+		{AF7AC630-D858-4361-8206-BE795B1E5044}.Debug|x64.Build.0 = Debug|x64
+		{AF7AC630-D858-4361-8206-BE795B1E5044}.Debug|x86.ActiveCfg = Debug|Win32
+		{AF7AC630-D858-4361-8206-BE795B1E5044}.Debug|x86.Build.0 = Debug|Win32
+		{AF7AC630-D858-4361-8206-BE795B1E5044}.Release|x64.ActiveCfg = Release|x64
+		{AF7AC630-D858-4361-8206-BE795B1E5044}.Release|x64.Build.0 = Release|x64
+		{AF7AC630-D858-4361-8206-BE795B1E5044}.Release|x86.ActiveCfg = Release|Win32
+		{AF7AC630-D858-4361-8206-BE795B1E5044}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {27BF5684-1E12-4D95-A2B0-EB4105003E7F}
+	EndGlobalSection
+EndGlobal
