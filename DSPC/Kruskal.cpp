@@ -1,210 +1,272 @@
-// #include <iostream>
-// #include <vector>
-// #include <unordered_map>
-// #include <algorithm>
-//
-// using namespace std;
-// // Define the DIRECTIONS array as a global constant
-// const vector<pair<int, int>> DIRECTIONS = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {-1, -1}, {1, 1}, {-1, 1}, {1, -1}};
-//
-// class UnionFind
-// {
-// public:
-//     UnionFind(const vector<pair<int, int>>& vertices, const vector<int>& values)
-//     {
-//         for (size_t i = 0; i < vertices.size(); i++)
-//         {
-//             parent[vertices[i]] = vertices[i];
-//             rank[vertices[i]] = 0;
-//             sizes[vertices[i]] = 1;
-//             min_values[vertices[i]] = values[i];
-//             max_values[vertices[i]] = values[i];
-//         }
-//     }
-//
-//     pair<int, int> find(const pair<int, int>& x)
-//     {
-//         if (parent[x] == x)
-//             return x;
-//         return find(parent[x]);
-//     }
-//
-//     void union_sets(const pair<int, int>& x, const pair<int, int>& y)
-//     {
-//         pair<int, int> x_root = find(x);
-//         pair<int, int> y_root = find(y);
-//
-//         if (rank[x_root] < rank[y_root])
-//         {
-//             parent[x_root] = y_root;
-//             sizes[y_root] += sizes[x_root];
-//             min_values[y_root] = min(min_values[y_root], min_values[x_root]);
-//             max_values[y_root] = max(max_values[y_root], max_values[x_root]);
-//         }
-//         else
-//         {
-//             parent[y_root] = x_root;
-//             sizes[x_root] += sizes[y_root];
-//             min_values[x_root] = min(min_values[x_root], min_values[y_root]);
-//             max_values[x_root] = max(max_values[x_root], max_values[y_root]);
-//             if (rank[x_root] == rank[y_root])
-//                 rank[x_root]++;
-//         }
-//     }
-//
-//     int size(const pair<int, int>& x)
-//     {
-//         return sizes[find(x)];
-//     }
-//
-//     int max_diff(const pair<int, int>& x)
-//     {
-//         return max_values[find(x)] - min_values[find(x)];
-//     }
-//
-//     unordered_map<pair<int, int>, pair<int, int>> parent;
-//     unordered_map<pair<int, int>, int> rank;
-//     unordered_map<pair<int, int>, int> sizes;
-//     unordered_map<pair<int, int>, int> min_values;
-//     unordered_map<pair<int, int>, int> max_values;
-// };
-//
-// bool is_valid_position(int next_x, int next_y, int n, int m)
-// {
-//     return (next_x >= 0 && next_x < n) && (next_y >= 0 && next_y < m);
-// }
-//
-// vector<pair<int, pair<int, int>>> get_edges(const vector<vector<int>>& image, int n, int m)
-// {
-//     vector<pair<int, pair<int, int>>> edges;
-//     for (int i = 0; i < n; i++)
-//     {
-//         for (int j = 0; j < m; j++)
-//         {
-//             for (const auto& dir : DIRECTIONS)
-//             {
-//                 int next_x = i + dir.first;
-//                 int next_y = j + dir.second;
-//                 if (!is_valid_position(next_x, next_y, n, m))
-//                     continue;
-//                 int weight = abs(image[i][j] - image[next_x][next_y]);
-//                 edges.push_back({weight, {i, j}, {next_x, next_y}});
-//             }
-//         }
-//     }
-//     return edges;
-// }
-//
-// vector<pair<int, int>> get_roots(const UnionFind& uf)
-// {
-//     vector<pair<int, int>> roots;
-//     for (const auto& entry : uf.parent)
-//     {
-//         if (entry.first == entry.second)
-//             roots.push_back(entry.first);
-//     }
-//     return roots;
-// }
-//
-// void label_connected_component(int i, int j, UnionFind& uf, int label, vector<vector<int>>& res)
-// {
-//     pair<int, int> curr = {i, j};
-//     while (uf.find(curr) != curr)
-//     {
-//         res[curr.first][curr.second] = label;
-//         curr = uf.find(curr);
-//     }
-//     res[curr.first][curr.second] = label;
-// }
-//
-// vector<vector<int>> segment_image(int k, const vector<vector<int>>& image)
-// {
-//     int n = image.size();
-//     int m = image[0].size();
-//
-//     vector<pair<int, int>> vertices;
-//     vector<int> values;
-//
-//     // Get vertices and values to build UnionFind
-//     for (int i = 0; i < n; i++)
-//     {
-//         for (int j = 0; j < m; j++)
-//         {
-//             vertices.push_back({i, j});
-//             values.push_back(image[i][j]);
-//         }
-//     }
-//
-//     UnionFind uf(vertices, values);
-//
-//     // Get all edges and sort by weight
-//     vector<pair<int, pair<int, int>>> edges = get_edges(image, n, m);
-//     sort(edges.begin(), edges.end());
-//
-//     // Kruskal's algorithm
-//     for (const auto& edge : edges)
-//     {
-//         int weight = edge.first;vousing using namespace cv;// To Convert an image to con vert an image to graph to be used by MSTstruct Pixel {}int x,y, , weight;int x;int y;int weight;intensitystruct vector<EPixel> convertMatToPixel(Mat image_) {}
-//         pair<int, int> u = edge.second;
-//         pair<int, int> v = edge.third;
-//
-//         pair<int, int> u_root = uf.find(u);
-//         pair<int, int> v_root = uf.find(v);
-//         int threshold = min(uf.max_diff(u) + k / uf.size(u), uf.max_diff(v) + k / uf.size(v));
-//
-//         if (u_root != v_root && weight <= threshold)
-//         {
-//             uf.union_sets(u, v);
-//         }
-//     }
-//
-//     // Initialize the result vector
-//     vector<vector<int>> res(n, vector<int>(m, -1));
-//
-//     // Get all roots (the ultimate parent of each segment)
-//     vector<pair<int, int>> roots = get_roots(uf);
-//
-//     // Assign a unique label to each segment
-//     unordered_map<pair<int, int>, int> root_to_label;
-//     int label = 0;
-//     for (const auto& root : roots)
-//     {
-//         root_to_label[root] = label;
-//         label++;
-//     }
-//
-//     // Label all connected components
-//     for (int i = 0; i < n; i++)
-//     {
-//         for (int j = 0; j < m; j++)
-//         {
-//             if (res[i][j] != -1)
-//                 continue;
-//             pair<int, int> curr_root = uf.find({i, j});
-//             int curr_label = root_to_label[curr_root];
-//             label_connected_component(i, j, uf, curr_label, res);
-//         }
-//     }
-//
-//     return res;
-// }
-//
-// int main()
-// {
-//     // Example usage
-//     int k = 10;
-//     vector<vector<int>> image = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-//     vector<vector<int>> segmented_image = segment_image(k, image);
-//
-//     // Output the segmented image
-//     for (const auto& row : segmented_image)
-//     {
-//         for (int label : row)
-//         {
-//             cout << label << " ";
-//         }
-//         cout << endl;
-//     }
-//
-//     return 0;
-// }
+#include <iostream>
+
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/core/base.hpp>
+#include <opencv2/imgproc.hpp>
+
+#include "ImageProcessing.h"
+
+using namespace std;
+using namespace cv;
+
+struct Edge
+{
+    int src, dest;
+    int weight;
+};
+
+void kruskalArraySegmentation(Mat& segmented, const Mat& input)
+{
+    int numRows = input.rows;
+    int numCols = input.cols;
+    int numNodes = numRows * numCols;
+
+    // Maximum number of possible edges (assuming 4-connectivity)
+    const int maxEdges = 2 * numRows * numCols - numRows - numCols;
+
+    // Create an array to store edges
+    Edge* edges = new Edge[maxEdges];
+
+    int edgeCount = 0; // Track the number of edges
+
+    // Populate the edges with intensity differences as weights
+    for (int x = 0; x < numRows; ++x)
+    {
+        for (int y = 0; y < numCols; ++y)
+        {
+            int nodeA = x * numCols + y;
+            if (x < numRows - 1)
+            {
+                // Check lower neighbor
+                int nodeB = (x + 1) * numCols + y;
+                int weight = std::abs(input.at<uchar>(x, y) - input.at<uchar>(x + 1, y));
+                edges[edgeCount++] = {nodeA, nodeB, weight};
+            }
+            if (y < numCols - 1)
+            {
+                // Check right neighbor
+                int nodeB = x * numCols + (y + 1);
+                int weight = std::abs(input.at<uchar>(x, y) - input.at<uchar>(x, y + 1));
+                edges[edgeCount++] = {nodeA, nodeB, weight};
+            }
+        }
+    }
+
+    // Sort edges by weight (you can use a custom sorting function)
+    // Implement a sorting algorithm or use std::sort if you prefer
+    // std::sort(edges, edges + edgeCount, [](const Edge& a, const Edge& b) { return a.weight < b.weight; });
+
+    // Create an array for the disjoint-set data structure
+    int* parent = new int[numNodes];
+
+    // Initialize the parent array
+    for (int i = 0; i < numNodes; ++i)
+    {
+        parent[i] = i;
+    }
+
+    // Initialize the segmented image
+    segmented = cv::Mat(numRows, numCols, CV_8U, cv::Scalar(0));
+
+    // Merge segments using Kruskal's algorithm
+    for (int i = 0; i < edgeCount; ++i)
+    {
+        int parentA = parent[edges[i].src];
+        int parentB = parent[edges[i].dest];
+
+        if (parentA != parentB)
+        {
+            segmented.at<uchar>(edges[i].src / numCols, edges[i].src % numCols) = 255; // Assign segment label
+            parent[parentB] = parentA; // Merge segments
+        }
+    }
+
+    // Clean up allocated memory
+    delete[] edges;
+    delete[] parent;
+}
+
+// Function to perform image segmentation using Kruskal's algorithm
+void kruskalOpenMPSegmentation(cv::Mat& segmented, const cv::Mat& input)
+{
+    int numRows = input.rows;
+    int numCols = input.cols;
+    int numNodes = numRows * numCols;
+
+    // Create a vector to store edges
+    std::vector<Edge> edges;
+    // Populate the edges with intensity differences as weights
+#pragma omp parallel for shared(edges)
+    for (int x = 0; x < numRows; ++x)
+    {
+        for (int y = 0; y < numCols; ++y)
+        {
+            int nodeA = x * numCols + y;
+            if (x < numRows - 1)
+            {
+                // Check lower neighbor
+                int nodeB = (x + 1) * numCols + y;
+                int weight = std::abs(input.at<uchar>(x, y) - input.at<uchar>(x + 1, y));
+#pragma omp critical
+                {
+                    edges.push_back({nodeA, nodeB, weight});
+                }
+            }
+            if (y < numCols - 1)
+            {
+                // Check right neighbor
+                int nodeB = x * numCols + (y + 1);
+                int weight = std::abs(input.at<uchar>(x, y) - input.at<uchar>(x, y + 1));
+#pragma omp critical
+                {
+                    edges.push_back({nodeA, nodeB, weight});
+                }
+            }
+        }
+    }
+
+    // Sort edges by weight
+    std::sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b)
+    {
+        return a.weight < b.weight;
+    });
+
+    // Create a disjoint-set for merging segments
+    DisjointSet disjointSet(numNodes);
+
+    // Initialize the segmented image
+    segmented = cv::Mat(numRows, numCols, CV_8U, cv::Scalar(0));
+
+    // Merge segments using Kruskal's algorithm
+#pragma omp parallel for shared(disjointSet, segmented)
+    for (int i = 0; i < edges.size(); i++)
+    {
+        Edge edge = edges[i];
+        int parentA = disjointSet.find(edge.src);
+        int parentB = disjointSet.find(edge.dest);
+
+        if (parentA != parentB)
+        {
+#pragma omp critical
+            {
+                segmented.at<uchar>(edge.src / numCols, edge.src % numCols) = 255; // Assign segment label
+                disjointSet.unionSets(parentA, parentB);
+            }
+        }
+    }
+}
+
+// Function to perform image segmentation using Kruskal's algorithm
+void kruskalSegmentation(cv::Mat& segmented, const cv::Mat& input)
+{
+    int numRows = input.rows;
+    int numCols = input.cols;
+    int numNodes = numRows * numCols;
+
+    // Create a vector to store edges
+    std::vector<Edge> edges;
+
+    // Populate the edges with intensity differences as weights
+    for (int x = 0; x < numRows; ++x)
+    {
+        for (int y = 0; y < numCols; ++y)
+        {
+            int nodeA = x * numCols + y;
+            if (x < numRows - 1)
+            {
+                // Check lower neighbor
+                int nodeB = (x + 1) * numCols + y;
+                int weight = std::abs(input.at<uchar>(x, y) - input.at<uchar>(x + 1, y));
+                edges.push_back({nodeA, nodeB, weight});
+            }
+            if (y < numCols - 1)
+            {
+                // Check right neighbor
+                int nodeB = x * numCols + (y + 1);
+                int weight = std::abs(input.at<uchar>(x, y) - input.at<uchar>(x, y + 1));
+                edges.push_back({nodeA, nodeB, weight});
+            }
+        }
+    }
+
+    int sum = 0;
+    for (int i = 0; i < edges.size(); i++)
+    {
+        sum += edges[i].weight;
+    }
+    int average = sum / edges.size();
+    int stdDev = 0;
+    for (int i = 0; i < edges.size(); i++)
+    {
+        stdDev += (edges[i].weight - average) * (edges[i].weight - average);
+    }
+    stdDev = sqrt(stdDev / edges.size());
+    int threshold = average + stdDev;
+
+    // Remove edges with weight less than or equal to threshold
+    for (int i = 0; i < edges.size(); i++)
+    {
+        if (edges[i].weight <= threshold)
+        {
+            edges.erase(edges.begin() + i);
+        }
+    }
+
+    // Sort edges by weight
+    std::sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b)
+    {
+        return a.weight < b.weight;
+    });
+
+    // Create a disjoint-set for merging segments
+    DisjointSet disjointSet(numNodes);
+
+    // Initialize the segmented image
+    segmented = cv::Mat(numRows, numCols, CV_8U, cv::Scalar(0));
+
+    // Merge segments using Kruskal's algorithm
+    for (const Edge& edge : edges)
+    {
+        int parentA = disjointSet.find(edge.src);
+        int parentB = disjointSet.find(edge.dest);
+
+        if (parentA != parentB)
+        {
+            segmented.at<uchar>(edge.src / numCols, edge.src % numCols) = 255; // Assign segment label
+            disjointSet.unionSets(parentA, parentB);
+        }
+    }
+}
+
+int main()
+{
+    Mat image = imread("C:\\Users\\TYH\\source\\repos\\DSPC\\x64\\Debug\\lena.png");
+    cout << "Image size: " << image.cols << "x" << image.rows << endl;
+    int edgeCount;
+    int mstCount;
+    // Edge* edges = Edge::fromImage(image, edgeCount);
+    // Edge* mst = Edge::formKruskal(edges, image.cols, image.rows, mstCount);
+    // Edge* groupMST(mst, mstCount);
+    // drawMST(image, mst, mstCount);
+    // Pixel** regions = segmentOpenMP(mst, edgeCount, mstCount);
+    cv::Mat inputImage = cv::imread("C:\\Users\\TYH\\source\\repos\\DSPC\\x64\\Debug\\lena.png",
+                                    cv::IMREAD_GRAYSCALE);
+
+    if (inputImage.empty())
+    {
+        std::cerr << "Error: Unable to load the input image." << std::endl;
+        return 1;
+    }
+
+    // Perform Kruskal's algorithm-based segmentation
+    cv::Mat segmentedImage;
+    kruskalSegmentation(segmentedImage, inputImage);
+
+    // Display the segmented image
+    cv::imshow("Segmented Image", segmentedImage);
+    cv::waitKey(0);
+
+    waitKey(0);
+    return 0;
+}
