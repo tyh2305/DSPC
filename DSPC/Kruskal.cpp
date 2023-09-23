@@ -16,7 +16,7 @@ struct Edge
     int weight;
 };
 
-void kruskalImagePreprocess(Mat& input, vector<Edge>& edges)
+void kruskalImagePreprocess(Mat& input, vector<Edge>& edges, bool removeOutlier)
 {
     double start = omp_get_wtime();
     cout << "Start Image Preprocess" << endl;
@@ -50,32 +50,35 @@ void kruskalImagePreprocess(Mat& input, vector<Edge>& edges)
     }
     double pptime = omp_get_wtime();
     cout << "Preprocess Time: " << pptime - start << endl << endl;
-    cout << "Start eliminate outlier" << endl;
-    int sum = 0;
-    for (int i = 0; i < edges.size(); i++)
+    if (removeOutlier)
     {
-        sum += edges[i].weight;
-    }
-    cout << "Sum: " << sum << endl;
-    int average = sum / edges.size();
-    int stdDev = 0;
-    for (int i = 0; i < edges.size(); i++)
-    {
-        stdDev += (edges[i].weight - average) * (edges[i].weight - average);
-    }
-    cout << "Standard Deviation: " << stdDev << endl;
-    stdDev = sqrt(stdDev / edges.size());
-    int threshold = average + stdDev;
-    cout << "Threshold: " << threshold << endl;
-    cout << "Removing outlier for size of: " << edges.size() << endl;
-    // Remove edges with weight less than or equal to threshold
-    for (int i = 0; i < edges.size(); i++)
-    {
-        cout << "Current : " << i << "/" << edges.size() << endl;
-        if (edges[i].weight <= threshold)
+        cout << "Start eliminate outlier" << endl;
+        int sum = 0;
+        for (int i = 0; i < edges.size(); i++)
         {
-            edges.erase(edges.begin() + i);
+            sum += edges[i].weight;
         }
+        cout << "Sum: " << sum << endl;
+        int average = sum / edges.size();
+        int stdDev = 0;
+        for (int i = 0; i < edges.size(); i++)
+        {
+            stdDev += (edges[i].weight - average) * (edges[i].weight - average);
+        }
+        cout << "Standard Deviation: " << stdDev << endl;
+        stdDev = sqrt(stdDev / edges.size());
+        int threshold = average + stdDev;
+        cout << "Threshold: " << threshold << endl;
+        cout << "Removing outlier for size of: " << edges.size() << endl;
+        // Remove edges with weight less than or equal to threshold
+
+        // for (int i = 0; i < edges.size(); i++)
+        // {
+        //     if (edges[i].weight <= threshold)
+        //     {
+        //         edges.erase(edges.begin() + i);
+        //     }
+        // }
     }
     double emtime = omp_get_wtime() - pptime;
     cout << "Eliminate Time: " << emtime << endl << endl;
@@ -415,7 +418,9 @@ int main()
     // Perform Kruskal's algorithm-based segmentation
     cv::Mat segmentedImage;
     vector<Edge> edges;
-    kruskalImagePreprocess(inputImage, edges);
+    bool removeOutlier = true;
+
+    kruskalImagePreprocess(inputImage, edges, removeOutlier);
     kruskalMergeRegion(segmentedImage, inputImage, edges);
     kruskalMergeRegionOpenMP(segmentedImage, inputImage, edges);
     // kruskalMergeRegionOpenMP(segmentedImage, inputImage, edges);
