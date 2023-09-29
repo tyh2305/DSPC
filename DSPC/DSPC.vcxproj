@@ -119,11 +119,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>C:\Users\TYH\DevDrives\OpenCL-Wrapper\src\OpenCL\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_world480d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenCL.lib;opencv_world480d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(CUDA_LIB_PATH);C:\Users\TYH\DevDrives\OpenCL-Wrapper\src\OpenCL\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,11 +146,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DSPC.cpp" />
+    <ClCompile Include="DSPC.cu" />
+    <ClCompile Include="ImageProcessing.cpp" />
     <ClCompile Include="imgProcessing.cpp" />
     <ClCompile Include="Kruskal.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ImageProcessing" />
+    <ClInclude Include="ImageProcessing.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="kruskal.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

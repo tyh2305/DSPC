@@ -127,20 +127,25 @@ void kruskalMergeRegion(Mat& segmented, const Mat& input, vector<Edge>& edges)
     cout << "Normal Time: " << end - start << endl << endl;
 }
 
-void mergeRegions(int start, int end, const std::vector<Edge>& edges, DisjointSet& disjointSet, cv::Mat& segmented, int numCols) {
-    for (int i = start; i < end; i++) {
+void mergeRegions(int start, int end, const std::vector<Edge>& edges, DisjointSet& disjointSet, cv::Mat& segmented,
+                  int numCols)
+{
+    for (int i = start; i < end; i++)
+    {
         Edge edge = edges[i];
         int parentA = disjointSet.find(edge.src);
         int parentB = disjointSet.find(edge.dest);
 
-        if (parentA != parentB) {
+        if (parentA != parentB)
+        {
             segmented.at<uchar>(edge.src / numCols, edge.src % numCols) = 255; // Assign segment label
             disjointSet.unionSets(parentA, parentB);
         }
     }
 }
 
-void kruskalMergeRegionThreads(cv::Mat& segmented, const cv::Mat& input, std::vector<Edge>& edges) {
+void kruskalMergeRegionThreads(cv::Mat& segmented, const cv::Mat& input, std::vector<Edge>& edges)
+{
     int numRows = input.rows;
     int numCols = input.cols;
     int numNodes = numRows * numCols;
@@ -160,17 +165,20 @@ void kruskalMergeRegionThreads(cv::Mat& segmented, const cv::Mat& input, std::ve
 
     // Create a vector to hold thread objects
     std::vector<std::thread> threads;
-    
+
     // Launch threads
-    for (int i = 0; i < numThreads; i++) {
+    for (int i = 0; i < numThreads; i++)
+    {
         int start = i * edgesPerThread;
         int end = (i == numThreads - 1) ? edges.size() : (i + 1) * edgesPerThread;
 
-        threads.emplace_back(mergeRegions, start, end, std::ref(edges), std::ref(disjointSet), std::ref(segmented), numCols);
+        threads.emplace_back(mergeRegions, start, end, std::ref(edges), std::ref(disjointSet), std::ref(segmented),
+                             numCols);
     }
 
     // Wait for threads to complete
-    for (std::thread& thread : threads) {
+    for (std::thread& thread : threads)
+    {
         thread.join();
     }
 
@@ -430,109 +438,119 @@ std::string WideStringToString(const wchar_t* wideStr)
     return result;
 }
 
-//
-// LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-// {
-//     switch (message)
-//     {
-//     case WM_CREATE:
-//         {
-//             // Create a "Choose Image" button
-//             CreateWindow(
-//                 L"BUTTON", // Button class name
-//                 L"Choose Image", // Button text
-//                 WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, // Button style
-//                 10, 10, 120, 30, // Button position and size
-//                 hWnd, // Parent window handle
-//                 (HMENU)1, // Button ID
-//                 NULL, // Instance handle (HINSTANCE)
-//                 NULL // Additional data
-//             );
-//             break;
-//         }
-//     case WM_COMMAND:
-//         {
-//             if (LOWORD(wParam) == 1) // Button click event
-//             {
-//                 // Open a file dialog to select an image
-//                 OPENFILENAME ofn;
-//                 WCHAR szFile[MAX_PATH] = L"";
-//
-//                 ZeroMemory(&ofn, sizeof(OPENFILENAME));
-//                 ofn.lStructSize = sizeof(OPENFILENAME);
-//                 ofn.hwndOwner = hWnd;
-//                 ofn.lpstrFile = szFile;
-//                 ofn.nMaxFile = MAX_PATH;
-//                 ofn.lpstrFilter = L"Image Files\0*.bmp;*.jpg;*.png\0All Files\0*.*\0";
-//                 ofn.nFilterIndex = 1;
-//                 ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-//
-//                 if (GetOpenFileName(&ofn))
-//                 {
-//                     // The selected image path is now in szFile
-//                     // MessageBox(hWnd, szFile, L"Selected Image", MB_OK | MB_ICONINFORMATION);
-//                     cv::Mat inputImage = cv::imread(WideStringToString(szFile),
-//                                                     cv::IMREAD_GRAYSCALE);
-//                     cout << "input Image size: " << inputImage.cols << "x" << inputImage.rows << endl;
-//
-//                     if (inputImage.empty())
-//                     {
-//                         std::cerr << "Error: Unable to load the input image." << std::endl;
-//                         return 1;
-//                     }
-//                     else
-//                     {
-//                         // Perform Kruskal's algorithm-based segmentation
-//                         cv::Mat segmentedImage;
-//                         vector<Edge> edges;
-//                         bool removeOutlier = true;
-//
-//                         kruskalImagePreprocess(inputImage, edges, removeOutlier);
-//                         kruskalMergeRegion(segmentedImage, inputImage, edges);
-//                         kruskalMergeRegionOpenMP(segmentedImage, inputImage, edges);
-//                         cv::imshow("Segmented Image", segmentedImage);
-//                         cv::waitKey(0);
-//                     }
-//                 }
-//             }
-//             break;
-//         }
-//     case WM_DESTROY:
-//         PostQuitMessage(0);
-//         break;
-//     default:
-//         return DefWindowProc(hWnd, message, wParam, lParam);
-//     }
-//     return 0;
-// }
-//
-// int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-// {
-//     // Register the window class
-//     WNDCLASSEX wcex = {
-//         sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW, WndProc, 0, 0, GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
-//         L"ImageChooser", NULL
-//     };
-//     RegisterClassEx(&wcex);
-//
-//     // Create the window
-//     HWND hWnd = CreateWindow(L"ImageChooser", L"Image Chooser", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 400,
-//                              200, NULL, NULL, GetModuleHandle(NULL), NULL);
-//     if (!hWnd)
-//     {
-//         return FALSE;
-//     }
-//
-//     ShowWindow(hWnd, nCmdShow);
-//     UpdateWindow(hWnd);
-//
-//     // Main message loop
-//     MSG msg;
-//     while (GetMessage(&msg, NULL, 0, 0))
-//     {
-//         TranslateMessage(&msg);
-//         DispatchMessage(&msg);
-//     }
-//
-//     return (int)msg.wParam;
-// }
+// Global variable remove outlier
+int removeOutlier = 0;
+
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_CREATE:
+        {
+            // Create a "Choose Image" button
+            CreateWindow(
+                L"BUTTON", // Button class name
+                L"Choose Image", // Button text
+                WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, // Button style
+                10, 10, 120, 30, // Button position and size
+                hWnd, // Parent window handle
+                (HMENU)1, // Button ID
+                NULL, // Instance handle (HINSTANCE)
+                NULL // Additional data
+            );
+            break;
+        }
+    case WM_COMMAND:
+        {
+            if (LOWORD(wParam) == 1) // Button click event
+            {
+                // Open a file dialog to select an image
+                OPENFILENAME ofn;
+                WCHAR szFile[MAX_PATH] = L"";
+
+                ZeroMemory(&ofn, sizeof(OPENFILENAME));
+                ofn.lStructSize = sizeof(OPENFILENAME);
+                ofn.hwndOwner = hWnd;
+                ofn.lpstrFile = szFile;
+                ofn.nMaxFile = MAX_PATH;
+                ofn.lpstrFilter = L"Image Files\0*.bmp;*.jpg;*.png\0All Files\0*.*\0";
+                ofn.nFilterIndex = 1;
+                ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+                // bool removeOutlierChecked = IsDlgButtonChecked(hWnd, 2) == BST_CHECKED;
+                if (GetOpenFileName(&ofn))
+                {
+                    // The selected image path is now in szFile
+                    // MessageBox(hWnd, szFile, L"Selected Image", MB_OK | MB_ICONINFORMATION);
+                    cv::Mat inputImage = cv::imread(WideStringToString(szFile),
+                                                    cv::IMREAD_GRAYSCALE);
+                    cout << "input Image size: " << inputImage.cols << "x" << inputImage.rows << endl;
+
+                    if (inputImage.empty())
+                    {
+                        std::cerr << "Error: Unable to load the input image." << std::endl;
+                        return 1;
+                    }
+                    else
+                    {
+                        // Perform Kruskal's algorithm-based segmentation
+                        cv::Mat segmentedImage;
+                        vector<Edge> edges;
+
+                        kruskalImagePreprocess(inputImage, edges, removeOutlier == 1);
+                        // kruskalMergeRegion(segmentedImage, inputImage, edges);
+                        kruskalMergeRegionOpenMP(segmentedImage, inputImage, edges);
+                        cv::imshow("Segmented Image", segmentedImage);
+                        cv::waitKey(0);
+                    }
+                }
+            }
+            else if (LOWORD(wParam) == 2) // Checkbox state change event
+            {
+                // Read the state of the checkbox
+                bool removeOutlierChecked = IsDlgButtonChecked(hWnd, 2) == BST_CHECKED;
+
+                // Update the removeOutlier option based on the checkbox state
+                removeOutlier = removeOutlierChecked ? 1 : 0;
+            }
+            break;
+        }
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+    // Register the window class
+    WNDCLASSEX wcex = {
+        sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW, WndProc, 0, 0, GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
+        L"ImageChooser", NULL
+    };
+    RegisterClassEx(&wcex);
+
+    // Create the window
+    HWND hWnd = CreateWindow(L"ImageChooser", L"Image Chooser", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 400,
+                             200, NULL, NULL, GetModuleHandle(NULL), NULL);
+    if (!hWnd)
+    {
+        return FALSE;
+    }
+
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
+
+    // Main message loop
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return (int)msg.wParam;
+}
